@@ -191,3 +191,60 @@ curl -XPOST 'localhost:9200/bank/_search?pretty' -d '
     }
   }
 }'
+
+21) Group By
+------------
+
+curl -XPOST 'localhost:9200/bank/_search?pretty' -d '
+{
+  "size": 0,
+  "aggs": {
+    "group_by_state": {
+      "terms": {
+        "field": "state"
+      }
+    }
+  }
+}'
+
+22) Aggregation inside aggregation
+-----------------------------------
+curl -XPOST 'localhost:9200/bank/_search?pretty' -d '
+{
+  "size": 0,
+  "aggs": {
+    "group_by_age": {
+      "range": {
+        "field": "age",
+        "ranges": [
+          {
+            "from": 20,
+            "to": 30
+          },
+          {
+            "from": 30,
+            "to": 40
+          },
+          {
+            "from": 40,
+            "to": 50
+          }
+        ]
+      },
+      "aggs": {
+        "group_by_gender": {
+          "terms": {
+            "field": "gender"
+          },
+          "aggs": {
+            "average_balance": {
+              "avg": {
+                "field": "balance"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}'
